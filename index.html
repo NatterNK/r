@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Espacio de Calma - Ketty</title>
+  
+  <!-- Optimización iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Calma Ketty">
+  <meta name="theme-color" content="#FAF7F2">
+
+  <!-- Tipografía Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              bg: '#FAF7F2',
+              card: '#FFFFFF',
+              surface: '#F3EFE6',
+              primary: '#5E826F',     // Verde salvia sobrio y descansado
+              primaryDark: '#4A6959',
+              accent: '#B87B67',
+              text: '#3A3833',
+              muted: '#757067',
+              border: '#E8E3D8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #3A3833;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased overflow-hidden">
+
+  <!-- HEADER -->
+  <header class="bg-brand-card/95 backdrop-blur-md border-b border-brand-border px-4 py-3 flex items-center justify-between flex-shrink-0 z-10 shadow-xs">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-full bg-brand-surface border border-brand-border flex items-center justify-center text-xl shadow-inner">
+        🌿
+      </div>
+      <div>
+        <h1 class="text-base font-semibold text-brand-text leading-tight">Un ratito para ti</h1>
+        <p class="text-xs text-brand-muted">Espacio de calma para Ketty</p>
+      </div>
+    </div>
+
+    <!-- BOTÓN MODAL DE CONTACTOS -->
+    <button 
+      id="openSupportBtn"
+      class="flex items-center space-x-1.5 bg-brand-surface hover:bg-brand-border/60 text-brand-text px-3 py-1.5 rounded-full text-xs font-semibold transition active:scale-95 border border-brand-border">
+      <span>📞</span>
+      <span>Llamar</span>
+    </button>
+  </header>
+
+  <!-- PÍLDORAS EMOCIONALES DE ACCESO RÁPIDO -->
+  <section class="bg-brand-bg px-3 py-2 border-b border-brand-border/60 flex-shrink-0">
+    <div class="flex space-x-2 overflow-x-auto hide-scrollbar py-1">
+      <button onclick="sendQuickPrompt('Me duelen mucho los huesos y el cuerpo hoy, me siento agotada.')" class="whitespace-nowrap px-3.5 py-1.5 rounded-full bg-brand-card border border-brand-border text-xs text-brand-text font-medium shadow-xs hover:border-brand-primary active:scale-95 transition">
+        🦴 Me duele el cuerpo
+      </button>
+      <button onclick="sendQuickPrompt('Ando con los monos y abrumada, siento que no puedo con todo.')" class="whitespace-nowrap px-3.5 py-1.5 rounded-full bg-brand-card border border-brand-border text-xs text-brand-text font-medium shadow-xs hover:border-brand-primary active:scale-95 transition">
+        😮‍💨 Ando con los monos
+      </button>
+      <button onclick="sendQuickPrompt('Hagamos una pausita con un tecito. ¿Me ayudas a respirar un momento?')" class="whitespace-nowrap px-3.5 py-1.5 rounded-full bg-brand-card border border-brand-border text-xs text-brand-text font-medium shadow-xs hover:border-brand-primary active:scale-95 transition">
+        🍵 Pausa y respirar
+      </button>
+      <button onclick="sendQuickPrompt('Estoy preocupada por la plata, la casa y mi familia, me cuesta estar tranquila.')" class="whitespace-nowrap px-3.5 py-1.5 rounded-full bg-brand-card border border-brand-border text-xs text-brand-text font-medium shadow-xs hover:border-brand-primary active:scale-95 transition">
+        💭 Preocupada por todo
+      </button>
+      <button onclick="sendQuickPrompt('Me siento culpable por descansar y pedir ayuda.')" class="whitespace-nowrap px-3.5 py-1.5 rounded-full bg-brand-card border border-brand-border text-xs text-brand-text font-medium shadow-xs hover:border-brand-primary active:scale-95 transition">
+        ❤️ Siento culpa
+      </button>
+    </div>
+  </section>
+
+  <!-- ÁREA DE CHAT -->
+  <main id="chatContainer" class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+    <!-- Mensaje Inicial de Bienvenida -->
+    <div class="flex items-start space-x-2.5">
+      <div class="w-8 h-8 rounded-full bg-brand-primary/15 border border-brand-primary/20 flex items-center justify-center text-sm flex-shrink-0">
+        🌱
+      </div>
+      <div class="max-w-[85%] bg-brand-card border border-brand-border rounded-2xl rounded-tl-sm px-4 py-3 shadow-xs text-brand-text text-sm sm:text-base leading-relaxed">
+        Hola, Ketty. Este es un rincón tranquilo para ti, para soltar lo que traigas en la cabeza o simplemente conversar sin apuros. ¿Cómo ha estado tu día hoy?
+      </div>
+    </div>
+  </main>
+
+  <!-- INDICADOR DE ESCRIBIENDO -->
+  <div id="typingIndicator" class="hidden px-6 py-2 flex items-center space-x-2 text-xs text-brand-muted">
+    <div class="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></div>
+    <div class="w-2 h-2 rounded-full bg-brand-primary animate-pulse" style="animation-delay: 0.2s"></div>
+    <div class="w-2 h-2 rounded-full bg-brand-primary animate-pulse" style="animation-delay: 0.4s"></div>
+    <span class="pl-1">Escribiendo...</span>
+  </div>
+
+  <!-- BARRA DE ENTRADA -->
+  <footer class="bg-brand-card border-t border-brand-border px-3 py-2.5 flex-shrink-0">
+    <form id="chatForm" class="flex items-center space-x-2 max-w-3xl mx-auto">
+      <input 
+        type="text" 
+        id="userInput" 
+        placeholder="Escribe lo que sientes aquí, Ketty..." 
+        autocomplete="off"
+        class="flex-1 bg-brand-surface border border-brand-border focus:border-brand-primary focus:bg-white rounded-full px-4 py-2.5 text-sm sm:text-base text-brand-text outline-none transition placeholder-brand-muted/70 shadow-inner"
+      />
+      <button 
+        type="submit" 
+        id="sendBtn"
+        class="bg-brand-primary hover:bg-brand-primaryDark text-white w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition active:scale-95 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-90" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+        </svg>
+      </button>
+    </form>
+  </footer>
+
+  <!-- MODAL DE CONTACTOS (SIN NÚMERO DE SUICIDIO) -->
+  <div id="supportModal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-brand-card border border-brand-border rounded-3xl w-full max-w-sm max-h-[90vh] overflow-y-auto p-5 shadow-xl flex flex-col space-y-4">
+      
+      <div class="flex justify-between items-center border-b border-brand-border/70 pb-3">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">📞</span>
+          <h2 class="text-base font-bold text-brand-text">Tus Contactos de Cariño</h2>
+        </div>
+        <button id="closeSupportBtn" class="text-brand-muted hover:text-brand-text text-xl p-1 font-semibold leading-none">&times;</button>
+      </div>
+
+      <!-- CONTACTO PREDETERMINADO: MATI -->
+      <div class="bg-brand-surface rounded-2xl p-3.5 border border-brand-border space-y-2">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-bold text-sm text-brand-text">Mati (Hijo)</h3>
+            <p class="text-xs text-brand-muted">+569 5130 7073</p>
+          </div>
+          <span class="text-xs font-semibold text-brand-primary bg-white px-2 py-0.5 rounded-full border border-brand-border">Siempre contigo</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <a href="tel:+56951307073" class="flex items-center justify-center space-x-1.5 bg-brand-primary text-white text-xs font-semibold py-2 rounded-xl active:scale-95 transition shadow-xs">
+            <span>📞</span>
+            <span>Llamar</span>
+          </a>
+          <a href="https://wa.me/56951307073" target="_blank" class="flex items-center justify-center space-x-1.5 bg-[#25D366] text-white text-xs font-semibold py-2 rounded-xl active:scale-95 transition shadow-xs">
+            <span>💬</span>
+            <span>WhatsApp</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- OTROS CONTACTOS GUARDADOS -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-semibold text-brand-muted uppercase tracking-wider">Otros contactos guardados</h4>
+        <div id="customContactsList" class="space-y-2 text-xs">
+          <!-- Inyección dinámica -->
+        </div>
+
+        <!-- FORMULARIO AGREGAR CONTACTO -->
+        <div class="pt-1">
+          <details class="text-xs group">
+            <summary class="cursor-pointer text-brand-primary font-semibold hover:underline flex items-center space-x-1 py-1">
+              <span>➕ Agregar otro teléfono</span>
+            </summary>
+            <div class="mt-2 space-y-2 bg-brand-bg p-3 rounded-xl border border-brand-border">
+              <input id="newContactName" type="text" placeholder="Nombre (ej. Nachi, Papá...)" class="w-full bg-white border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-brand-text outline-none focus:border-brand-primary">
+              <input id="newContactPhone" type="tel" placeholder="Número (ej. +569...)" class="w-full bg-white border border-brand-border rounded-lg px-2.5 py-1.5 text-xs text-brand-text outline-none focus:border-brand-primary">
+              <button onclick="saveNewContact()" class="w-full bg-brand-primary text-white py-1.5 rounded-lg font-semibold active:scale-95 transition">Guardar contacto</button>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- LÍNEAS DE APOYO Y SALUD (SUAVES Y SIN ALARMISMOS) -->
+      <div class="border-t border-brand-border/70 pt-3 space-y-2">
+        <h4 class="text-xs font-semibold text-brand-muted uppercase tracking-wider">Orientación en salud (Chile)</h4>
+
+        <div class="bg-brand-surface border border-brand-border rounded-xl p-2.5 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-brand-text">Salud Responde (MINSAL)</p>
+            <p class="text-[10px] text-brand-muted">Orientación médica y apoyo 24/7</p>
+          </div>
+          <a href="tel:6003607777" class="bg-brand-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition">600 360 7777</a>
+        </div>
+
+        <div class="bg-brand-surface border border-brand-border rounded-xl p-2.5 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-bold text-brand-text">Fono Mayor (SENAMA)</p>
+            <p class="text-[10px] text-brand-muted">Orientación y acompañamiento</p>
+          </div>
+          <a href="tel:800400035" class="bg-brand-primary text-white text-xs font-semibold px-3 py-1.5 rounded-lg active:scale-95 transition">800 4000 35</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DEL CLIENTE -->
+  <script>
+    let chatHistory = [];
+
+    const chatContainer = document.getElementById('chatContainer');
+    const chatForm = document.getElementById('chatForm');
+    const userInput = document.getElementById('userInput');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const supportModal = document.getElementById('supportModal');
+    const openSupportBtn = document.getElementById('openSupportBtn');
+    const closeSupportBtn = document.getElementById('closeSupportBtn');
+
+    openSupportBtn.addEventListener('click', () => {
+      renderCustomContacts();
+      supportModal.classList.remove('hidden');
+    });
+
+    closeSupportBtn.addEventListener('click', () => {
+      supportModal.classList.add('hidden');
+    });
+
+    supportModal.addEventListener('click', (e) => {
+      if (e.target === supportModal) supportModal.classList.add('hidden');
+    });
+
+    function sendQuickPrompt(text) {
+      userInput.value = text;
+      handleSendMessage();
+    }
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      handleSendMessage();
+    });
+
+    async function handleSendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      appendMessage('user', message);
+      userInput.value = '';
+      chatHistory.push({ role: 'user', content: message });
+
+      typingIndicator.classList.remove('hidden');
+      scrollToBottom();
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            history: chatHistory.slice(-10),
+            message: message
+          })
+        });
+
+        const data = await response.json();
+        typingIndicator.classList.add('hidden');
+
+        if (response.ok && data.reply) {
+          appendMessage('assistant', data.reply);
+          chatHistory.push({ role: 'assistant', content: data.reply });
+        } else {
+          appendMessage('assistant', 'Aquí estoy, Ketty. Se me cortó un poquito la señal, pero cuéntame de nuevo.');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        typingIndicator.classList.add('hidden');
+        appendMessage('assistant', 'Hubo un problemita de conexión, Ketty. Tómate un tecito y volvemos a conversar en un ratito.');
+      }
+
+      scrollToBottom();
+    }
+
+    function appendMessage(role, text) {
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex items-start space-x-2.5 ${role === 'user' ? 'justify-end' : ''}`;
+
+      if (role === 'assistant') {
+        wrapper.innerHTML = `
+          <div class="w-8 h-8 rounded-full bg-brand-primary/15 border border-brand-primary/20 flex items-center justify-center text-sm flex-shrink-0">
+            🌱
+          </div>
+          <div class="max-w-[85%] bg-brand-card border border-brand-border rounded-2xl rounded-tl-sm px-4 py-3 shadow-xs text-brand-text text-sm sm:text-base leading-relaxed">
+            ${escapeHTML(text).replace(/\n/g, '<br>')}
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <div class="max-w-[85%] bg-brand-primary text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-xs text-sm sm:text-base leading-relaxed">
+            ${escapeHTML(text).replace(/\n/g, '<br>')}
+          </div>
+        `;
+      }
+
+      chatContainer.appendChild(wrapper);
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    function getStoredContacts() {
+      try {
+        return JSON.parse(localStorage.getItem('kety_custom_contacts')) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveNewContact() {
+      const nameInput = document.getElementById('newContactName');
+      const phoneInput = document.getElementById('newContactPhone');
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      if (!name || !phone) return;
+
+      const contacts = getStoredContacts();
+      contacts.push({ id: Date.now(), name, phone });
+      localStorage.setItem('kety_custom_contacts', JSON.stringify(contacts));
+
+      nameInput.value = '';
+      phoneInput.value = '';
+      renderCustomContacts();
+    }
+
+    function deleteContact(id) {
+      let contacts = getStoredContacts();
+      contacts = contacts.filter(c => c.id !== id);
+      localStorage.setItem('kety_custom_contacts', JSON.stringify(contacts));
+      renderCustomContacts();
+    }
+
+    function renderCustomContacts() {
+      const container = document.getElementById('customContactsList');
+      const contacts = getStoredContacts();
+
+      if (contacts.length === 0) {
+        container.innerHTML = `<p class="text-brand-muted/70 italic py-1">No hay otros teléfonos agregados.</p>`;
+        return;
+      }
+
+      container.innerHTML = contacts.map(c => `
+        <div class="bg-brand-surface border border-brand-border rounded-xl p-2.5 flex items-center justify-between">
+          <div>
+            <p class="font-bold text-brand-text">${escapeHTML(c.name)}</p>
+            <p class="text-[10px] text-brand-muted">${escapeHTML(c.phone)}</p>
+          </div>
+          <div class="flex items-center space-x-1.5">
+            <a href="tel:${escapeHTML(c.phone)}" class="bg-brand-primary text-white px-2.5 py-1 rounded-lg text-xs font-semibold active:scale-95 transition">Llamar</a>
+            <button onclick="deleteContact(${c.id})" class="text-rose-500 hover:text-rose-700 px-1.5 py-1 text-sm font-bold">&times;</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>
